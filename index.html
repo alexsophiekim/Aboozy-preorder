@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon-home.png">
+  <link rel="shortcut icon" sizes="192x192" href="favicon-home.png">
+
+<title>Party Pack Preorder</title>
+<link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400..700;1,400..700&family=MuseoModerno:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+<img src="black-logo.png" alt="Aboozy Logo" width="150">
+<hr style="margin:20px 0;">
+<h2>Party Pack Preorder ($60)</h2>
+<p style="font-size: 14px;margin-bottom:1em;">25 Chicken + Mega Chips + 2 Fresh Slaws + 4 Extra sauces</p>
+
+<p>Bank Account: <strong id="account">06-0730-0465387-00</strong>
+<button class="copy-btn" onclick="copyAccount()">Copy</button></p>
+<p style="font-size:14px;color:#555;">
+💡 Once you have made the payment, we will check your order and a confirmation text will be sent to you.</p>
+<form id="orderForm">
+  <input type="text" name="name" placeholder="Name" required><br>
+  <input type="email" name="email" placeholder="Email" required><br>
+  <input type="tel" name="phone" placeholder="Phone" required><br>
+  <input type="text" name="address" placeholder="Address" required><br>
+  <textarea name="note" placeholder="Notes / special instructions"></textarea><br>
+  <button type="submit" class="submit-btn">Submit Order</button>
+</form>
+
+<p id="status"></p>
+
+<script>
+const accountNumber = "06-0730-0465387-00"; // <-- Replace with actual account number
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxusq9A8uNUKG50YJIC2mlOCmOkj-62sgd5b6T2Ul0BhmrK-_OMLD9L1PbOsn41kpdy/exec"; // <-- Apps Script Web App URL
+
+function copyAccount() {
+  const acc = document.getElementById("account").innerText;
+  navigator.clipboard.writeText(accountNumber);
+  alert("Account number copied!");
+}
+
+document.getElementById("orderForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const form = e.target;
+
+  const formData = new URLSearchParams({
+    name: form.name.value,
+    email: form.email.value,
+    phone: form.phone.value,
+    address: form.address.value,
+    note: form.note.value,
+    items: "Party Pack",
+    total: 60
+  });
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(resp => {
+    if(resp.status === "success") {
+      document.getElementById("status").innerText = 
+        "✅ Order submitted! Once you pay, we will confirm via text.";
+      form.reset();
+    } else {
+      document.getElementById("status").innerText = "❌ Error: " + resp.message;
+    }
+  })
+  .catch(err => {
+    document.getElementById("status").innerText = "❌ Fetch error: " + err;
+  });
+});
+</script>
+</body>
+</html>
